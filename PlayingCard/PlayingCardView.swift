@@ -64,6 +64,21 @@ class PlayingCardView: UIView {
         //frame is the location
         configureCornerLabel(upperLeftCornerLabel)
         upperLeftCornerLabel.frame.origin = bounds.origin.offsetBy(dx: cornerOffset, dy: cornerOffset)
+        
+        configureCornerLabel(lowRightCornerLabel)
+        //transform lowRightCornerLabel
+        lowRightCornerLabel.transform = CGAffineTransform.identity
+            .translatedBy(x: lowRightCornerLabel.frame.width, y: lowRightCornerLabel.frame.height)
+            .rotated(by: CGFloat.pi)
+        lowRightCornerLabel.frame.origin = CGPoint(x: bounds.maxX, y: bounds.maxY)
+            .offsetBy(dx: -cornerOffset, dy: -cornerOffset)
+            .offsetBy(dx: -lowRightCornerLabel.frame.width, dy: -lowRightCornerLabel.frame.height)
+    }
+    
+    //font change have to call this, like font = UIFontMetrics(forTextStyle: .body).scaledFont(for: font)
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        setNeedsDisplay()
+        setNeedsLayout()
     }
     
 
