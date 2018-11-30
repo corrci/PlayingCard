@@ -8,11 +8,25 @@
 
 import UIKit
 
+@IBDesignable //can edit in interface
 class PlayingCardView: UIView {
-    
+    @IBInspectable
     var rank: Int = 5 {didSet{ setNeedsDisplay(); setNeedsLayout()}}
+    @IBInspectable
     var suit: String = "♥️" {didSet{ setNeedsDisplay(); setNeedsLayout()}}
+    @IBInspectable
     var isFaceUp: Bool = true {didSet{ setNeedsDisplay(); setNeedsLayout()}}
+    
+    var faceCardScale: CGFloat = SizeRatio.faceCardImageSizeToBoundsSize{didSet{ setNeedsDisplay()}}
+    
+    @objc func adjustFaceCardScale(byHandingGestureRecognizedBy recognizer: UIPinchGestureRecognizer){
+        switch recognizer.state {
+        case .changed, .ended:
+            faceCardScale *= recognizer.scale
+        default:
+            break
+        }
+    }
     
     //creat rect and cornerRadius
     override func draw(_ rect: CGRect) {
@@ -22,14 +36,20 @@ class PlayingCardView: UIView {
         roundRect.fill()
         
         //JQK put Image
-        if let faceCardImage = UIImage(named: rankString+suit){
-            faceCardImage.draw(in: bounds.zoom(by: SizeRatio.faceCardImageSizeToBoundsSize))
+        if isFaceUp{
+            if let faceCardImage = UIImage(named: rankString+suit, in: Bundle(for: self.classForCoder), compatibleWith: traitCollection){
+                faceCardImage.draw(in: bounds.zoom(by: faceCardScale))
+            }else{
+                // other card pips
+                drawPips()
+            }
         }else{
-            // other card pips
-            drawPips()
+            if let cardBackImage = UIImage(named: "cardBack", in: Bundle(for: self.classForCoder), compatibleWith: traitCollection){
+                cardBackImage.draw(in: bounds)
+            }
         }
     }
-
+    
     private func centeredAttributedString(_ string: String, fontSize: CGFloat) -> NSAttributedString{
         //create font and fontSize
         var font = UIFont.preferredFont(forTextStyle: .body).withSize(fontSize)
